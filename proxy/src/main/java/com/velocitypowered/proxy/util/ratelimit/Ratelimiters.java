@@ -28,6 +28,13 @@ public final class Ratelimiters {
     throw new AssertionError();
   }
 
+  /**
+   * Creates a rate limiter with the specified number of milliseconds.
+   *
+   * @param <T> the type to rate limit
+   * @param ms the number of milliseconds
+   * @return the rate limiter
+   */
   @SuppressWarnings("unchecked")
   public static <T> Ratelimiter<T> createWithMilliseconds(long ms) {
     return ms <= 0 ? (Ratelimiter<T>) NoopCacheRatelimiter.INSTANCE

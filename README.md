@@ -2,7 +2,7 @@
 
 **CleanVelocity** is a stripped-down and optimized fork of Velocity, with many unnecessary features, configuration options, and commands removed for maximum stability and simplicity. The main goal is to remove all optional built-in functionality so that the proxy can be fully customized through plugins based on your specific needs.
 
-Original [Velocity](https://papermc.io/downloads/velocity) by [PaperMC](https://papermc.io). Velocity is licensed under the GPLv3 license.
+Original [Velocity](https://github.com/PaperMC/Velocity) by [PaperMC](https://papermc.io). Velocity is licensed under the GPLv3 license.
 
 ## What was changed / removed:
 
