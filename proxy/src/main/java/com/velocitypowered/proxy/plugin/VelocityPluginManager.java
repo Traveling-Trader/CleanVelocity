@@ -20,7 +20,6 @@ package com.velocitypowered.proxy.plugin;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Joiner;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
@@ -106,7 +105,7 @@ public class VelocityPluginManager implements PluginManager {
 
           if (maybeExistingCandidate != null) {
             logger.error("Refusing to load plugin at path {} since we already "
-                    + "loaded a plugin with the same ID {} from {}",
+                + "loaded a plugin with the same ID {} from {}",
                 candidate.getSource().map(Objects::toString).orElse("<UNKNOWN>"),
                 candidate.getId(),
                 maybeExistingCandidate.getSource().map(Objects::toString).orElse("<UNKNOWN>"));
@@ -128,8 +127,7 @@ public class VelocityPluginManager implements PluginManager {
     Map<String, PluginDescription> loadedCandidates = new HashMap<>();
     Map<PluginContainer, Module> pluginContainers = new LinkedHashMap<>();
     // Now load the plugins
-    pluginLoad:
-    for (PluginDescription candidate : sortedPlugins) {
+    pluginLoad: for (PluginDescription candidate : sortedPlugins) {
       // Verify dependencies
       for (PluginDependency dependency : candidate.getDependencies()) {
         if (!dependency.isOptional() && !loadedCandidates.containsKey(dependency.getId())) {
@@ -176,8 +174,6 @@ public class VelocityPluginManager implements PluginManager {
         continue;
       }
 
-      logger.info("Loaded plugin {} {} by {}", description.getId(), description.getVersion()
-          .orElse("<UNKNOWN>"), Joiner.on(", ").join(description.getAuthors()));
       registerPlugin(container);
     }
   }

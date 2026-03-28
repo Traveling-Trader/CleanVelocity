@@ -13,7 +13,6 @@ haproxy-protocol = false
 tcp-fast-open = false
 enable-reuse-port = false
 accepts-transfers = false
-prevent-client-proxy-connections = false
 
 [servers]
 server = "127.0.0.1:25566"

@@ -63,8 +63,6 @@ public class VelocityConfiguration implements ProxyConfig {
   @Expose
   private boolean onlineMode = true;
   @Expose
-  private boolean preventClientProxyConnections = true;
-  @Expose
   private PlayerInfoForwarding playerInfoForwardingMode = PlayerInfoForwarding.NONE;
   private byte[] forwardingSecret = generateRandomString(12).getBytes(StandardCharsets.UTF_8);
   @Expose
@@ -117,11 +115,6 @@ public class VelocityConfiguration implements ProxyConfig {
         logger.error("'bind' option does not specify a valid IP address.", e);
         valid = false;
       }
-    }
-
-    if (!onlineMode) {
-      logger.warn("The proxy is running in offline mode! This is a security risk and you will NOT "
-          + "receive any support!");
     }
 
     switch (playerInfoForwardingMode) {
@@ -213,11 +206,6 @@ public class VelocityConfiguration implements ProxyConfig {
   @Override
   public boolean isOnlineMode() {
     return onlineMode;
-  }
-
-  @Override
-  public boolean shouldPreventClientProxyConnections() {
-    return advanced.isPreventClientProxyConnections();
   }
 
   public PlayerInfoForwarding getPlayerInfoForwardingMode() {
@@ -503,8 +491,6 @@ public class VelocityConfiguration implements ProxyConfig {
     @Expose
     private int compressionLevel = -1;
     @Expose
-    private boolean preventClientProxyConnections = false;
-    @Expose
     private boolean proxyProtocol = false;
     @Expose
     private boolean tcpFastOpen = false;
@@ -521,7 +507,6 @@ public class VelocityConfiguration implements ProxyConfig {
       if (config != null) {
         this.compressionThreshold = config.getIntOrElse("compression-threshold", 256);
         this.compressionLevel = config.getIntOrElse("compression-level", -1);
-        this.preventClientProxyConnections = config.getOrElse("prevent-client-proxy-connections", false);
         if (config.contains("haproxy-protocol")) {
           this.proxyProtocol = config.getOrElse("haproxy-protocol", false);
         } else {
@@ -543,20 +528,16 @@ public class VelocityConfiguration implements ProxyConfig {
       return compressionLevel;
     }
 
-    public boolean isPreventClientProxyConnections() {
-      return preventClientProxyConnections;
-    }
-
     public int getLoginRatelimit() {
       return 0;
     }
 
     public int getConnectionTimeout() {
-      return 15000;
+      return 10000;
     }
 
     public int getReadTimeout() {
-      return 15000;
+      return 30000;
     }
 
     public boolean isProxyProtocol() {
@@ -584,7 +565,6 @@ public class VelocityConfiguration implements ProxyConfig {
       return "Advanced{"
           + "compressionThreshold=" + compressionThreshold
           + ", compressionLevel=" + compressionLevel
-          + ", preventClientProxyConnections=" + preventClientProxyConnections
           + ", proxyProtocol=" + proxyProtocol
           + ", tcpFastOpen=" + tcpFastOpen
           + ", acceptTransfers=" + acceptTransfers

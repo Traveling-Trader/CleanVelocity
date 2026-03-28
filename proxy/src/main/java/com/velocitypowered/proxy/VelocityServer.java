@@ -68,7 +68,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.http.HttpClient;
 import java.nio.file.Files;
@@ -295,56 +294,53 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     final MiniMessageTranslationStore translationRegistry = MiniMessageTranslationStore
         .create(Key.key("velocity", "translations"));
     translationRegistry.defaultLocale(Locale.US);
-    try {
-      ResourceUtils.visitResources(VelocityServer.class, path -> {
 
-        final Path langPath = Path.of("lang");
-
-        try {
-          if (!Files.exists(langPath)) {
-            Files.createDirectory(langPath);
-            try (final Stream<Path> files = Files.walk(path)) {
-              files.filter(Files::isRegularFile).forEach(file -> {
-                try {
-                  final Path langFile = langPath.resolve(file.getFileName().toString());
-                  if (!Files.exists(langFile)) {
-                    try (final InputStream is = Files.newInputStream(file)) {
-                      Files.copy(is, langFile);
-                    }
-                  }
-                } catch (IOException e) {
-                  logger.error("Encountered an I/O error whilst loading translations", e);
-                }
-              });
-            }
-
-          }
-
-          try (final Stream<Path> files = Files.walk(langPath)) {
+    final Path langPath = Path.of("lang");
+    if (Files.exists(langPath) && Files.isDirectory(langPath)) {
+      // If the user has created a lang folder, load from it ONLY
+      try (final Stream<Path> files = Files.walk(langPath)) {
+        files.filter(Files::isRegularFile).forEach(file -> {
+          loadPropertiesIntoStore(translationRegistry, file);
+        });
+      } catch (IOException e) {
+        logger.error("Encountered an I/O error whilst loading user translations", e);
+      }
+    } else {
+      // Load default translations from the JAR's embedded resources ONLY IF lang folder is missing
+      try {
+        ResourceUtils.visitResources(VelocityServer.class, path -> {
+          try (final Stream<Path> files = Files.walk(path)) {
             files.filter(Files::isRegularFile).forEach(file -> {
-              final String filename = com.google.common.io.Files
-                  .getNameWithoutExtension(file.getFileName().toString());
-              final String localeName = filename.replace("messages_", "")
-                  .replace("messages", "")
-                  .replace('_', '-');
-              final Locale locale = localeName.isBlank()
-                  ? Locale.US
-                  : Locale.forLanguageTag(localeName);
-
-              translationRegistry.registerAll(locale, file, false);
-              ClosestLocaleMatcher.INSTANCE.registerKnown(locale);
+              loadPropertiesIntoStore(translationRegistry, file);
             });
+          } catch (IOException e) {
+            logger.error("Encountered an I/O error whilst loading translations", e);
           }
-
-        } catch (IOException e) {
-          logger.error("Encountered an I/O error whilst loading translations", e);
-        }
-      }, "com", "velocitypowered", "proxy", "l10n");
-    } catch (IOException e) {
-      logger.error("Encountered an I/O error whilst loading translations", e);
-      return;
+        }, "com", "velocitypowered", "proxy", "l10n");
+      } catch (IOException e) {
+        logger.error("Encountered an I/O error whilst loading translations", e);
+      }
     }
+
     GlobalTranslator.translator().addSource(translationRegistry);
+  }
+
+  private void loadPropertiesIntoStore(MiniMessageTranslationStore store, Path file) {
+    final String filename = com.google.common.io.Files
+        .getNameWithoutExtension(file.getFileName().toString());
+    final String localeName = filename.replace("messages_", "")
+        .replace("messages", "")
+        .replace('_', '-');
+    final Locale locale = localeName.isBlank()
+        ? Locale.US
+        : Locale.forLanguageTag(localeName);
+
+    try {
+      store.registerAll(locale, file, false);
+      ClosestLocaleMatcher.INSTANCE.registerKnown(locale);
+    } catch (Exception e) {
+      logger.warn("Could not load translation file {} for locale {}: {}", file, locale, e.getMessage());
+    }
   }
 
   @SuppressFBWarnings("DM_EXIT")

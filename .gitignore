@@ -25,7 +25,8 @@ local.properties
 .recommenders/
 .apt_generated/
 .project
-.classpath
+.classpath\
+.vscode
 
 ### Linux ###
 *~

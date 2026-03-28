@@ -205,10 +205,6 @@ public class InitialLoginSessionHandler implements MinecraftSessionHandler {
       String url = String.format(MOJANG_HASJOINED_URL,
           urlFormParameterEscaper().escape(login.getUsername()), serverId);
 
-      if (server.getConfiguration().shouldPreventClientProxyConnections()) {
-        url += "&ip=" + urlFormParameterEscaper().escape(playerIp);
-      }
-
       final HttpRequest httpRequest = HttpRequest.newBuilder()
               .setHeader("User-Agent",
                       server.getVersion().getName() + "/" + server.getVersion().getVersion())
