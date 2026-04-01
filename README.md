@@ -20,4 +20,4 @@ Original [Velocity](https://github.com/PaperMC/Velocity) by [PaperMC](https://pa
 
 ## Download & Running
 
-The compiled JAR file can be **downloaded from the [Releases]** section on this GitHub. Requires Java 21 or higher.
+The compiled JAR file can be **downloaded from the [Releases](https://github.com/Traveling-Trader/CleanVelocity/releases)** section on this GitHub. Requires Java 21 or higher.

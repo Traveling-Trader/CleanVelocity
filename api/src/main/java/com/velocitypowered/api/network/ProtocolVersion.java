@@ -95,7 +95,7 @@ public enum ProtocolVersion implements Ordered<ProtocolVersion> {
   MINECRAFT_1_21_7(772, "1.21.7", "1.21.8"),
   MINECRAFT_1_21_9(773, "1.21.9", "1.21.10"),
   MINECRAFT_1_21_11(774, "1.21.11"),
-  MINECRAFT_26_1(775, "26.1");
+  MINECRAFT_26_1(775, "26.1", "26.1.1");
 
   private static final int SNAPSHOT_BIT = 30;
 
@@ -113,22 +113,26 @@ public enum ProtocolVersion implements Ordered<ProtocolVersion> {
   public static final ProtocolVersion MAXIMUM_VERSION = values()[values().length - 1];
 
   /**
-   * The user-friendly representation of the lowest and highest supported versions.
+   * The user-friendly representation of the lowest and highest supported
+   * versions.
    */
   public static final String SUPPORTED_VERSION_STRING = String
       .format("%s-%s", MINIMUM_VERSION.getVersionIntroducedIn(),
           MAXIMUM_VERSION.getMostRecentSupportedVersion());
 
   /**
-   * A map linking the protocol version number to its {@link ProtocolVersion} representation.
+   * A map linking the protocol version number to its {@link ProtocolVersion}
+   * representation.
    */
   public static final ImmutableMap<Integer, ProtocolVersion> ID_TO_PROTOCOL_CONSTANT;
 
   static {
     Map<Integer, ProtocolVersion> versions = new HashMap<>();
     for (ProtocolVersion version : values()) {
-      // For versions where the snapshot is compatible with the prior release version, Mojang will
-      // default to that. Follow that behavior since there is precedent (all the Minecraft 1.8
+      // For versions where the snapshot is compatible with the prior release version,
+      // Mojang will
+      // default to that. Follow that behavior since there is precedent (all the
+      // Minecraft 1.8
       // minor releases use the same protocol version).
       versions.putIfAbsent(version.protocol, version);
       if (version.snapshotProtocol != -1) {
@@ -140,7 +144,8 @@ public enum ProtocolVersion implements Ordered<ProtocolVersion> {
   }
 
   /**
-   * A set containing all the protocols that the proxy actually supports, excluding special-purpose
+   * A set containing all the protocols that the proxy actually supports,
+   * excluding special-purpose
    * "versions" like {@link #LEGACY} and {@link #UNKNOWN}.
    */
   public static final Set<ProtocolVersion> SUPPORTED_VERSIONS;
@@ -184,8 +189,10 @@ public enum ProtocolVersion implements Ordered<ProtocolVersion> {
    * Returns the user-friendly name for this protocol.
    *
    * @return the protocol name
-   * @deprecated A protocol may be shared by multiple versions. Use @link{#getVersionIntroducedIn()}
-   *     or @link{#getVersionsSupportedBy()} to get more accurate version names.
+   * @deprecated A protocol may be shared by multiple versions.
+   *             Use @link{#getVersionIntroducedIn()}
+   *             or @link{#getVersionsSupportedBy()} to get more accurate version
+   *             names.
    */
   @Deprecated
   public String getName() {

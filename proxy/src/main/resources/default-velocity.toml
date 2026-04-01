@@ -6,13 +6,12 @@ online-mode = true
 player-info-forwarding-mode = "none"
 ping-passthrough = "disabled"
 force-key-authentication = true
-
+accepts-transfers = false
+enable-reuse-port = false
+tcp-fast-open = false
+haproxy-protocol = false
 compression-threshold = 256
 compression-level = 6
-haproxy-protocol = false
-tcp-fast-open = false
-enable-reuse-port = false
-accepts-transfers = false
 
 [servers]
 server = "127.0.0.1:25566"
