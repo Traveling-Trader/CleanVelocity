@@ -4,6 +4,8 @@
 
 Original [Velocity](https://github.com/PaperMC/Velocity) by [PaperMC](https://papermc.io). Velocity is licensed under the GPLv3 license.
 
+**You can use my projec [CleanPaper](https://github.com/Traveling-Trader/CleanPaper) as a backend server for your CleanVelocity.**
+
 ## What was changed / removed:
 
 - Removed bStats analytics;
