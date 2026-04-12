@@ -74,6 +74,8 @@ public class VelocityConfiguration implements ProxyConfig {
   private @Nullable Favicon favicon;
   @Expose
   private boolean forceKeyAuthentication = true; // Added in 1.19
+  @Expose
+  private PacketLimiterConfig packetLimiterConfig = PacketLimiterConfig.DEFAULT;
 
   private VelocityConfiguration(Servers servers, Advanced advanced) {
     this.servers = servers;
@@ -85,7 +87,7 @@ public class VelocityConfiguration implements ProxyConfig {
       PingPassthroughMode pingPassthrough,
       Servers servers,
       Advanced advanced,
-      boolean forceKeyAuthentication) {
+      boolean forceKeyAuthentication, PacketLimiterConfig packetLimiterConfig) {
     this.bind = bind;
     this.onlineMode = onlineMode;
     this.playerInfoForwardingMode = playerInfoForwardingMode;
@@ -95,6 +97,7 @@ public class VelocityConfiguration implements ProxyConfig {
     this.advanced = advanced;
 
     this.forceKeyAuthentication = forceKeyAuthentication;
+    this.packetLimiterConfig = packetLimiterConfig;
   }
 
   /**
@@ -294,6 +297,10 @@ public class VelocityConfiguration implements ProxyConfig {
     return advanced.isEnableReusePort();
   }
 
+  public PacketLimiterConfig getPacketLimiterConfig() {
+    return packetLimiterConfig;
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
@@ -306,6 +313,7 @@ public class VelocityConfiguration implements ProxyConfig {
 
         .add("favicon", favicon)
         .add("forceKeyAuthentication", forceKeyAuthentication)
+        .add("packetLimiterConfig", packetLimiterConfig)
         .toString();
   }
 
@@ -382,7 +390,7 @@ public class VelocityConfiguration implements ProxyConfig {
       final String bind = config.getOrElse("bind", "0.0.0.0:25565");
       final boolean onlineMode = config.getOrElse("online-mode", true);
       final boolean forceKeyAuthentication = config.getOrElse("force-key-authentication", true);
-
+      final PacketLimiterConfig packetLimiterConfig = PacketLimiterConfig.fromConfig(config.get("packet-limiter"));
       // Throw an exception if the forwarding-secret file is empty and the proxy is
       // using a
       // forwarding mode that requires it.
@@ -400,7 +408,9 @@ public class VelocityConfiguration implements ProxyConfig {
           pingPassthroughMode,
           new Servers(serversConfig),
           new Advanced(config),
-          forceKeyAuthentication);
+          forceKeyAuthentication,
+          packetLimiterConfig
+      );
     }
   }
 
@@ -573,4 +583,32 @@ public class VelocityConfiguration implements ProxyConfig {
     }
   }
 
+  /**
+   * Configuration for packet limiting.
+   *
+   * @param interval the interval in seconds to measure packets over
+   * @param pps      the maximum number of packets per second allowed
+   * @param bytes    the maximum number of bytes per second allowed
+   */
+  public record PacketLimiterConfig(int interval, int pps, int bytes) {
+    public static PacketLimiterConfig DEFAULT = new PacketLimiterConfig(7, 500, -1);
+
+    /**
+     * returns a PacketLimiterConfig from a config section, or the default if the section is null.
+     *
+     * @param config the configuration object to parse
+     * @return the packet limiter config, or the default if {@code config} is null
+     */
+    public static PacketLimiterConfig fromConfig(CommentedConfig config) {
+      if (config != null) {
+        return new PacketLimiterConfig(
+            config.getIntOrElse("interval", DEFAULT.interval()),
+            config.getIntOrElse("packets-per-second", DEFAULT.pps()),
+            config.getIntOrElse("bytes-per-second", DEFAULT.bytes())
+        );
+      } else {
+        return DEFAULT;
+      }
+    }
+  }
 }
